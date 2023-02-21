@@ -14,6 +14,7 @@ async function signup(e){
      let response=await axios.post("http://localhost:3000/user/signup",userinfo)
        if(response.status===201){
         alert('succesfully created accout')
+        window.location.href="./login.html"
        }
 
     

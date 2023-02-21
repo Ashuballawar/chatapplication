@@ -47,3 +47,7 @@ function isinvalid(a){
         }   
 
  }
+
+ exports.login=async (res,req,next)=>{
+            
+ }
