@@ -30,7 +30,7 @@ function isinvalid(a){
             catch(err){
                 console.log(err.name)
                 if(err.name=="SequelizeUniqueConstraintError"){
-                    res.status(403).json({error:'account already exist of this EmailId'})
+                    res.status(403).json({error:'account already exist of this EmailId or phonenumber'})
                 }
                 
                     else{
