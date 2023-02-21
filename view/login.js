@@ -12,8 +12,9 @@ async function login(e){
       if(response.status==201){
         alert('login successful')
         console.log(response.data.token)
-        alert('login Successfull')
+      
         localStorage.setItem('token',response.data.token)
+        window.location.href="./chat.html"
         }
     
     }
