@@ -1,5 +1,6 @@
 const user=require('../models/user');
 const bcrypt=require('bcryptjs')
+const jwt=require('jsonwebtoken')
 require('dotenv').config()
 
 function isinvalid(a){
@@ -48,6 +49,44 @@ function isinvalid(a){
 
  }
 
- exports.login=async (res,req,next)=>{
-            
+ exports.login=async (req,res,next)=>{
+    const { Op } = require("sequelize");
+         const Email=req.body.Email;
+         const Password=req.body.Password  
+         if(isinvalid(Email)||isinvalid(Password)){
+            return res.status(400).json({err:' Something is missing'})
+           } 
+           console.log('recieved request')
+          let userdata=await user.findAll({where:{
+            [Op.or]: [
+                { Email:Email },
+                { Phonenumber:Email }
+              ]
+         } })
+         if(userdata[0]){
+            bcrypt.compare(Password,userdata[0].Password,(err,result)=>{
+                if(err){
+                    throw new Error('Something went wrong')
+                   }
+                else if(result===true){
+                      res.status(201).json({token:generateAccessToken(userdata[0].id,userdata[0].Name)} )
+                }
+                else{
+                    res.status(401).json({msg:'Incorrect Password'})
+                }
+
+
+
+            })
+         }
+         else{
+            res.status(404).json({msg:'Incorrect EmailId or phonenumber'})
+         }
+
  }
+
+
+ function generateAccessToken(Id,Name){
+    return jwt.sign({userId:Id,Name:Name},process.env.JWT_SECRET)
+ }
+ 

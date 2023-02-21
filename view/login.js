@@ -8,11 +8,19 @@ async function login(e){
         }
     
         try{
-      response=await axios.post("http://localhost:4000/user/login",User)
-    
+      response=await axios.post("http://localhost:3000/user/login",User)
+      if(response.status==201){
+        alert('login successful')
+        console.log(response.data.token)
+        alert('login Successfull')
+        localStorage.setItem('token',response.data.token)
         }
+    
+    }
+
+
         catch(err){
-            
+            document.body.innerHTML+=`<div style="color:red;">${err}</div>`
         }
     
     
