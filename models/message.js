@@ -9,7 +9,12 @@ const message=sequelize.define('message',{
     },
     chat:{
         type:Sequelize.TEXT
-    }
+    },
+    Name:{
+        type:Sequelize.STRING,
+        allowNull:false
+    },
+
 })
 
 module.exports=message
