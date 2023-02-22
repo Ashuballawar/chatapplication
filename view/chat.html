@@ -12,13 +12,30 @@
     crossorigin="anonymous"></script>
 </head>
 <body>
-    <div style="
+    <!-- <div style="
     background-color: #80808057;
     height: 40px;
     padding: 5px;
-">You joined</div>
+">You joined</div> -->
 
+<form id="chatform" style="
+position: fixed;
+left: 0;
+bottom: 0;
+width: 100%;
+background-color: purple;
+color: white;
+text-align: center;
+padding: 0px 10px 20px 10px;
 
+">
+    <label for="chat"></label><br>
+    <input type="text" id="chat"  placeholder="message" required="" style="width:70%">
+    <button>send</button>
+
+</form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+<script src="chat.js"></script>
 
 </body>
 </html>

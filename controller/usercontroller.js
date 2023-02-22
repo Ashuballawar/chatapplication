@@ -90,3 +90,17 @@ function isinvalid(a){
     return jwt.sign({userId:Id,Name:Name},process.env.JWT_SECRET)
  }
  
+
+
+ exports.userlist=async(req,res,next)=>{
+        listOfNname=[];
+        list=await user.findAll({attributes:['Name','id']});
+        list.forEach(element => {
+            if(req.user.id===element.dataValues.id){
+                element.dataValues.Name='You'
+           }
+           listOfNname.push(element.dataValues.Name)
+        });
+        
+          res.status(200).json(listOfNname)
+ }
