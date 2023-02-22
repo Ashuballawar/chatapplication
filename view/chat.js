@@ -1,4 +1,4 @@
-
+//  setInterval(reload,10000);
 
 //document.getElementById('formbutton').addEventListener('click',sendmessage)
 async function sendmessage(e){
