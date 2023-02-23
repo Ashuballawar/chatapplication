@@ -8,4 +8,6 @@ router.post('/login',usercontroller.login)
 router.get('/userlist',getDataMiddleware,usercontroller.userlist)
 router.post('/sendchat',getDataMiddleware,chatcontroller.sendchat)
 router.get('/getchat',getDataMiddleware,chatcontroller.getchat)
+router.get('/previouschat',getDataMiddleware,chatcontroller.previouschat)
+
 module.exports=router;

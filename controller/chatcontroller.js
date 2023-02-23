@@ -15,16 +15,41 @@ exports.sendchat=async (req,res,next)=>{
 }
 
 exports.getchat=async(req,res,next)=>{
+    const { Op } = require("sequelize");
+   console.log('=====>',req.query.datalength)
     namewithMessage=[]
-      messageData= await message.findAll();
-      
+      messageData= await message.findAll({where: {
+         id:{[Op.gt]:req.query.datalength}}
+      });
+      if(messageData.length>0){
       messageData.forEach(element => {
         if(req.user.id===element.dataValues.userId){
             element.dataValues.Name='You'
        }
-        namewithMessage.push({Name:element.dataValues.Name,chat:element.dataValues.chat})
+        namewithMessage.push({Name:element.dataValues.Name,chat:element.dataValues.chat,id:element.dataValues.id})
       });
       console.log(namewithMessage)
-      res.status(200).json(namewithMessage)
-   
+      return res.status(200).json( messageData)
+    }
+
+}
+exports.previouschat=async(req,res,next)=>{
+    const { Op } = require("sequelize");
+    namewithMessage=[]
+    messageData= await message.findAll({where: {
+       id:{[Op.lt]:req.query.firstdata}}
+    });
+    if(messageData.length>0){
+    messageData.forEach(element => {
+      if(req.user.id===element.dataValues.userId){
+          element.dataValues.Name='You'
+     }
+      namewithMessage.push({Name:element.dataValues.Name,chat:element.dataValues.chat,id:element.dataValues.id})
+    });
+    console.log(namewithMessage)
+    return res.status(200).json( messageData)
+  }
+
+
+
 }
