@@ -99,7 +99,7 @@ function isinvalid(a){
             if(req.user.id===element.dataValues.id){
                 element.dataValues.Name='You'
            }
-           listOfNname.push(element.dataValues.Name)
+           listOfNname.push({Name:element.dataValues.Name,id:element.dataValues.id})
         });
         
           res.status(200).json(listOfNname)

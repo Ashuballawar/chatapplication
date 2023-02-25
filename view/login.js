@@ -14,7 +14,7 @@ async function login(e){
         console.log(response.data.token)
       
         localStorage.setItem('token',response.data.token)
-        window.location.href="./chat.html"
+        window.location.href="./group.html"
         }
     
     }
