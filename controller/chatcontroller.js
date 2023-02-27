@@ -18,6 +18,7 @@ exports.getchat=async(req,res,next)=>{
     const { Op } = require("sequelize");
    console.log('=====>',req.query.datalength)
     namewithMessage=[]
+    try{
       messageData= await message.findAll({where: {
          id:{[Op.gt]:req.query.datalength}}
       });
@@ -31,11 +32,16 @@ exports.getchat=async(req,res,next)=>{
       console.log(namewithMessage)
       return res.status(200).json( messageData)
     }
-
+  }
+  catch(err){
+    console.log(err)
+            res.status(500).json({error:err})
+  }
 }
 exports.previouschat=async(req,res,next)=>{
     const { Op } = require("sequelize");
     namewithMessage=[]
+    try{
     messageData= await message.findAll({where: {
        id:{[Op.lt]:req.query.firstdata}}
     });
@@ -49,7 +55,11 @@ exports.previouschat=async(req,res,next)=>{
     console.log(namewithMessage)
     return res.status(200).json( messageData)
   }
-
+    }
+    catch(err){
+      console.log(err)
+            res.status(500).json({error:err})
+    }
 
 
 }

@@ -11,10 +11,10 @@ const personalchat=sequelize.define('personalchat',{
         type:Sequelize.TEXT
     },
     sendBy:{
-        type:Sequelize.STRING
+        type:Sequelize.INTEGER
     },
     sendTo:{
-        type:Sequelize.STRING
+        type:Sequelize.INTEGER
     }
 })
 

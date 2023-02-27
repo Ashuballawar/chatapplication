@@ -14,6 +14,8 @@ function parseJwt (token) {
 document.getElementById('groupbutton').addEventListener('click',makegroup)
 
 async function makegroup(){
+
+    try{
     document.getElementById('groupbutton').style.visibility='hidden'
     event.preventDefault();
    ul=document.getElementById('list of users');
@@ -44,13 +46,17 @@ async function makegroup(){
 ">create group</button>`
 
 
-document.getElementById('creategroupbtn').addEventListener('click',sendGroupInfo)
+document.getElementById('creategroupbtn').addEventListener('click',sendGroupInfo)}
+catch(err){
+    console.log(err)
+}
 
 
 }
 
 async function sendGroupInfo(){
     event.preventDefault();
+    try{
     const token=localStorage.getItem('token')
     if(document.getElementById('groupName').value===''){
         return alert('groupName missing')
@@ -80,12 +86,16 @@ getgroupinfo(response.data.id,response.data.groupName)
     }
   
   
+}}
+catch(err){
+    console.log(err)
 }
 }
 
 //window.addEventListener('DOMContentLoaded',reload1)
 
 async function reload1(){
+    try{
     document.getElementById('list of groups').innerHTML=" ";
     const token=localStorage.getItem('token')
     let response=await axios.get("http://localhost:3000/group/getgroup",{headers:{'Authorization':token}})
@@ -94,33 +104,37 @@ async function reload1(){
         document.getElementById('list of groups').innerHTML+=`<li style="list-style:none; cursor: pointer; back;background-color: cornflowerblue;width: 40%;border: outset;" onclick="getgroupinfo(${element.id},'${element.groupName}')"  id=${element.id}>${element.groupName}</li>`
      });
 
-
+    }
+    catch(err){
+        console.log(err)
+    }
 }
 //window.addEventListener('DOMContentLoaded',getgroupinfo(localStorage.getItem('groupid')))
 async function getgroupinfo(id,groupName){
-    event.preventDefault();
+   // event.preventDefault();
+   try{
     console.log(groupName)
     localStorage.setItem('groupid',id)
     localStorage.setItem('groupName',groupName)
-    document.getElementById('groupName').innerHTML=`<h5>${groupName}</h5>`
+    document.getElementById('groupName').innerHTML=`<h5 style="cursor: pointer;" onclick="adminPage()">${groupName}</h5>`
     
     
     const token=localStorage.getItem('token')
-//    let gourpinfo=await axios.get(`http://localhost:3000/group/groupinfo/${id}`,{headers:{'Authorization':token}})
-   showchatbox(id)
-//    gourpinfo.data.forEach(element => {
-//     document.innerHTML+=``
-//     });  
-// console.log(gourpinfo) 
-ul=document.getElementById('chatspace')
-ul.innerHTML="";
 
+   showchatbox(id)
+
+ul=document.getElementById('chatspace')
+
+
+    
 let userlist=await axios.get(`http://localhost:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
+      if(userlist.status===200){
+        ul.innerHTML="";
 localStorage.setItem('userlist',userlist.data)
-userlist.data.forEach(element => {
- ul.innerHTML+=`<li style="list-style: none;">${element.Name} joined</li>`
+      userlist.data.forEach(element => {
+     ul.innerHTML+=`<li style="list-style: none;">${element.Name} joined</li>`
  
- });
+ });}
  let data=JSON.parse(localStorage.getItem(`group_${id}`))
 let lastid;
 let j=0;
@@ -133,7 +147,7 @@ if(data){
         btn.innerText='previousChat'
         btn.style.position='absolute'
         btn.style.bottom='-190px'
-        btn.style.left='43px'
+        btn.style.left='-83px'
         btn.style.border='outset'
         
         ul.appendChild(btn)
@@ -150,31 +164,37 @@ data.forEach(element => {
     j++;
    });}
    else{
+    
     lastid=0;
    }
 
    let response=await axios.get(`http://localhost:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
-   if(data){
-   response.data=data.concat(response.data)
-   if(response.data.length>10){
-    for(let i=0;i<response.data.length-10;i++){
-        response.data.shift()}
+   console.log(response)
+   
+   if(data.length>0){
+    response.data=data.concat(response.data)}
+  
+   while(response.data>10){
+    
 
-}}
-console.log(response)
+        response.data.shift()
+    console.log('response.data===>', response.data)
+    
+}
+console.log(response.data)
     localStorage.setItem(`group_${id}`,JSON.stringify(response.data))
   
   
+}catch(err){
+    console.log(err)
 }
-  
+}
 
-// async function rapiddata(id,lastid){
-//     let token=localStorage.getItem('token')
-//     let response=await axios.get(`http://localhost:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
-// return response
-// }
+
+
 
 async function showchatbox(id){
+    try{
     document.getElementById('divchat').innerHTML=`<ul id="chatspace" style="
     position: absolute;
     left: 755px;
@@ -196,10 +216,14 @@ async function showchatbox(id){
         <input type="text" id="chat"  placeholder="message" required="" style="width:70%">
     <button type="submit"  id="formbutton">send</button>
     </form>`
-    
+    }
+    catch(err){
+        console.log(err)
+    }
 }
 async function sendmessage(id){
     event.preventDefault();
+    
     let token=localStorage.getItem('token')
  message={
      chat:document.getElementById('chat').value}
@@ -210,22 +234,79 @@ async function sendmessage(id){
      if(response.status===201){
         console.log('fine')
         
-       
+        // document.getElementById('groupName').innerHTML+=``
         document.getElementById('chat').value=""
-        // getmsessage(id)
-        getgroupinfo(id,localStorage.getItem('groupName'))
+         getmsessage(id)
+       
+       
        
      }
+
+    }  
+       
+     
    
-}
+
    catch(err){
     console.log(err)
    }
 } 
 
+// setInterval(() => {
+//     getmsessage(localStorage.getItem('groupid')) 
+// }, 1000);
+
+async function getmsessage(id){
+    try{
+    let data=JSON.parse(localStorage.getItem(`group_${id}`))
+    let token=localStorage.getItem('token')
+    let lastid;
+    let j=0;
+    if(data){
+        console.log(data.length)
+        
+        lastid=data[data.length-1].id
+    
+    
+    let response=await axios.get(`http://localhost:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
+    if(response.status===201){
+        console.log('fine')
+        
+        // document.getElementById('groupName').innerHTML+=``
+        document.getElementById('chat').value=""
+         
+   
+    response.data.forEach(element => {
+        if(j%2===0){
+        ul.innerHTML+=`<li style="list-style: none;background-color:#8080807d;height:30px;padding:6px">${element.Name}:${element.chat} </li>`}
+        else{
+            ul.innerHTML+=`<li style="list-style: none;background-color:white;height:30px;padding:6px">${element.Name}:${element.chat} </li>`
+        }
+       
+            response.data=data.concat(response.data)
+           while(response.data.length>10){
+            
+                 response.data.shift()
+            
+        }
+         //console.log(response)
+             localStorage.setItem(`group_${id}`,JSON.stringify(response.data))
+       
+        j++;
+       });}
+    }}
+    catch(err){
+        console.log(err)
+    }
+
+}
+
+
+
 
 async function loadpreviouschat(){
     event.preventDefault();
+    try{
     let id=localStorage.getItem('groupid')
     const token=localStorage.getItem('token')
     console.log(`group_${id}`)
@@ -236,11 +317,15 @@ async function loadpreviouschat(){
        console.log(response);
       
        response.data =response.data.concat(data)
-       getdata(response.data)
+       getdata(response.data)}
+       catch(err){
+        console.log(err)
+       }
     }
     
     async function getdata(data){
         let j=0
+        try{
         let id=localStorage.getItem('groupid')
         ul=document.getElementById('chatspace')
         ul.innerHTML="";
@@ -264,6 +349,10 @@ async function loadpreviouschat(){
     
     
     })}
+    catch(err){
+        console.log(err)
+    }
+}
 
 
     window.addEventListener('DOMContentLoaded',reload2)
@@ -271,15 +360,20 @@ async function loadpreviouschat(){
     async function reload2(){
         event.preventDefault()
         reload1();
+        try{
        let id=localStorage.getItem('groupid')
        getgroupinfo(id,localStorage.getItem('groupName'));
        userlist();
-
+        }
+        catch(err){
+            console.log(err)
+        }
 
 
     }
     async function userlist(){
         const token=localStorage.getItem('token')
+        try{
       let ul=document.getElementById('personal')
         let userlist=await axios.get("http://localhost:3000/user/userlist",{headers:{'Authorization':token}})
 //localStorage.setItem('userlist',userlist.data)
@@ -289,11 +383,15 @@ userlist.data.forEach(element => {
     }
     ul.innerHTML+=`<li style="list-style:none; cursor: pointer; back;background-color: cornflowerblue;width: 40%;border: outset;"  id=${element.id} onclick="personalchat(${element.id},'${element.Name}')">${element.Name}</li>`
 });
-
+        }
+        catch(err){
+            console.log(err)
+        }
 
     }
     async function personalchat(id,Name){
         let userlistwithid=[]
+        try{
         const token=localStorage.getItem('token')
         userlistwithid[0]=id
         let groupinfo={
@@ -307,6 +405,19 @@ userlist.data.forEach(element => {
         else if(response.status===200){
             reload1()
             getgroupinfo(response.data.id,response.data.groupName)
+        }}
+        catch(err){
+            console.log(err)
         }
     }
 
+    async function adminPage(){
+        window.location.href="./admin.html"
+    }
+
+
+
+
+//    setInterval(() => {
+//     getgroupinfo(localStorage.getItem('groupid'),localStorage.getItem('groupName'))
+//    }, 1000);

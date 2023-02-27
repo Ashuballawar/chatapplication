@@ -56,6 +56,8 @@ function isinvalid(a){
          if(isinvalid(Email)||isinvalid(Password)){
             return res.status(400).json({err:' Something is missing'})
            } 
+
+           try{
            console.log('recieved request')
           let userdata=await user.findAll({where:{
             [Op.or]: [
@@ -82,7 +84,11 @@ function isinvalid(a){
          else{
             res.status(404).json({msg:'Incorrect EmailId or phonenumber'})
          }
-
+        }
+        catch(err){
+            console.log(err)
+            res.status(500).json({error:err})
+        }
  }
 
 
@@ -94,6 +100,7 @@ function isinvalid(a){
 
  exports.userlist=async(req,res,next)=>{
         listOfNname=[];
+        try{
         list=await user.findAll({attributes:['Name','id']});
         list.forEach(element => {
             if(req.user.id===element.dataValues.id){
@@ -102,5 +109,9 @@ function isinvalid(a){
            listOfNname.push({Name:element.dataValues.Name,id:element.dataValues.id})
         });
         
-          res.status(200).json(listOfNname)
+          res.status(200).json(listOfNname)}
+          catch(err){
+            console.log(err)
+            res.status(500).json({error:err})
+          }
  }
