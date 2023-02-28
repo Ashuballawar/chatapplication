@@ -252,9 +252,9 @@ async function sendmessage(id){
    }
 } 
 
-// setInterval(() => {
-//     getmsessage(localStorage.getItem('groupid')) 
-// }, 1000);
+setInterval(() => {
+    getmsessage(localStorage.getItem('groupid')) 
+}, 2000);
 
 async function getmsessage(id){
     try{
