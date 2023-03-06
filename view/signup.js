@@ -11,7 +11,7 @@ async function signup(e){
         Password:e.target.Password.value
       }
       try{
-     let response=await axios.post("http://13.235.132.81:3000/user/signup",userinfo)
+     let response=await axios.post("http://localhost:3000/user/signup",userinfo)
        if(response.status===201){
         alert('succesfully created accout')
         window.location.href="./login.html"
@@ -21,11 +21,11 @@ async function signup(e){
     }
      catch(err){
         console.log(err)
-        if(err.response.status===403){
-            alert(err.response.data.error)}
-        //document.body.innerHTML+=`<div style="color:red;">${err.response.data.error}</div>`}
-        else{
-            document.body.innerHTML+=`<div style="color:red;">${err}</div>`
-        }
+        // if(err.response.status===403){
+        //     alert(err.response.data.error)}
+        // //document.body.innerHTML+=`<div style="color:red;">${err.response.data.error}</div>`}
+        // else{
+        //     document.body.innerHTML+=`<div style="color:red;">${err}</div>`
+        // }
      }
 }

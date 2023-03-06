@@ -4,7 +4,7 @@ usernotingroup()
 async function getuserlist(){
     document.getElementById('adminGroupName').innerHTML=localStorage.getItem('groupName')
     let token=localStorage.getItem('token')
-let userlist=await axios.get(`http://13.235.132.81:3000/group/userlist/${localStorage.getItem('groupid')}`,{headers:{'Authorization':token}})
+let userlist=await axios.get(`http://localhost:3000/group/userlist/${localStorage.getItem('groupid')}`,{headers:{'Authorization':token}})
 console.log(userlist.data)
 
 let ul=document.getElementById('groupMember')
@@ -47,7 +47,7 @@ userlist.data.forEach(element => {
             }
             let token=localStorage.getItem('token')
             let groupid=localStorage.getItem('groupid')
-           let response=await axios.post(`http://13.235.132.81:3000/group/makeadmin/${localStorage.getItem('groupid')}`,userinfo,{headers:{'Authorization':token}})
+           let response=await axios.post(`http://localhost:3000/group/makeadmin/${localStorage.getItem('groupid')}`,userinfo,{headers:{'Authorization':token}})
             if(response.status===201){
                 getuserlist()  
             }
@@ -60,7 +60,7 @@ userlist.data.forEach(element => {
         async function removefromgroup(id){
             event.preventDefault();
             let token=localStorage.getItem('token')
-            let response=await axios.delete(`http://13.235.132.81:3000/group/delete/${localStorage.getItem('groupid')}?id=${id}`,{headers:{'Authorization':token}})
+            let response=await axios.delete(`http://localhost:3000/group/delete/${localStorage.getItem('groupid')}?id=${id}`,{headers:{'Authorization':token}})
                if(response.status===200){
                 getuserlist()
                 usernotingroup()
@@ -72,7 +72,7 @@ userlist.data.forEach(element => {
 
         async function usernotingroup(){
             let token=localStorage.getItem('token')
-            let userlist=await axios.get(`http://13.235.132.81:3000/group/adduser/${localStorage.getItem('groupid')}`,{headers:{'Authorization':token}})
+            let userlist=await axios.get(`http://localhost:3000/group/adduser/${localStorage.getItem('groupid')}`,{headers:{'Authorization':token}})
            if(userlist.status===200){
             let ul=document.getElementById('AddMember')
             ul.innerHTML=`<h3>Add Member </h3>`
@@ -96,7 +96,7 @@ userlist.data.forEach(element => {
             id:id
         }
        
-        let response=await axios.post(`http://13.235.132.81:3000/group/addtogroup/${localStorage.getItem('groupid')}`,userinfo,{headers:{'Authorization':token}})
+        let response=await axios.post(`http://localhost:3000/group/addtogroup/${localStorage.getItem('groupid')}`,userinfo,{headers:{'Authorization':token}})
        if(response.status===201){
        
         getuserlist()
