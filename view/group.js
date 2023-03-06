@@ -24,7 +24,7 @@ async function makegroup(){
    list.innerHTML='add in group'
    ul.appendChild(list)
    const token=localStorage.getItem('token')
-   let userlist=await axios.get("http://localhost:3000/user/userlist",{headers:{'Authorization':token}})
+   let userlist=await axios.get("http://13.235.132.81:3000/user/userlist",{headers:{'Authorization':token}})
   console.log( userlist)
   decodedtoken=parseJwt(token)
   console.log(decodedtoken)
@@ -75,7 +75,7 @@ let Name=document.getElementById('groupName').value
     Name:Name
   }
   
-  let response=await axios.post("http://localhost:3000/group/create",groupinfo,{headers:{'Authorization':token}})
+  let response=await axios.post("http://13.235.132.81:3000/group/create",groupinfo,{headers:{'Authorization':token}})
     if(response.status===201){
         alert('new group created')
   console.log("===>",response.data)
@@ -98,7 +98,7 @@ async function reload1(){
     try{
     document.getElementById('list of groups').innerHTML=" ";
     const token=localStorage.getItem('token')
-    let response=await axios.get("http://localhost:3000/group/getgroup",{headers:{'Authorization':token}})
+    let response=await axios.get("http://13.235.132.81:3000/group/getgroup",{headers:{'Authorization':token}})
     console.log(response.data)
     response.data.forEach(element => {
         document.getElementById('list of groups').innerHTML+=`<li style="list-style:none; cursor: pointer; back;background-color: cornflowerblue;width: 40%;border: outset;" onclick="getgroupinfo(${element.id},'${element.groupName}')"  id=${element.id}>${element.groupName}</li>`
@@ -127,7 +127,7 @@ ul=document.getElementById('chatspace')
 
 
     
-let userlist=await axios.get(`http://localhost:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
+let userlist=await axios.get(`http://13.235.132.81:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
       if(userlist.status===200){
         ul.innerHTML="";
 localStorage.setItem('userlist',userlist.data)
@@ -168,7 +168,7 @@ data.forEach(element => {
     lastid=0;
    }
 
-   let response=await axios.get(`http://localhost:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
+   let response=await axios.get(`http://13.235.132.81:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
    console.log(response)
    
    if(data.length>0){
@@ -230,7 +230,7 @@ async function sendmessage(id){
    
    try{
     console.log(chat)
-    let response=await axios.post(`http://localhost:3000/group/sendchat/${id}`,message,{headers:{'Authorization':token}})
+    let response=await axios.post(`http://13.235.132.81:3000/group/sendchat/${id}`,message,{headers:{'Authorization':token}})
      if(response.status===201){
         console.log('fine')
         
@@ -268,7 +268,7 @@ async function getmsessage(id){
         lastid=data[data.length-1].id
     
     
-    let response=await axios.get(`http://localhost:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
+    let response=await axios.get(`http://13.235.132.81:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
     if(response.status===201){
         console.log('fine')
         
@@ -313,7 +313,7 @@ async function loadpreviouschat(){
     let data=JSON.parse(localStorage.getItem(`group_${id}`))
     
     firstdata=data[0].id
-    let response=await axios.get(`http://localhost:3000/group/previouschat/${id}?firstdata=${firstdata}`,{headers:{'Authorization':token}})
+    let response=await axios.get(`http://13.235.132.81:3000/group/previouschat/${id}?firstdata=${firstdata}`,{headers:{'Authorization':token}})
        console.log(response);
       
        response.data =response.data.concat(data)
@@ -330,7 +330,7 @@ async function loadpreviouschat(){
         ul=document.getElementById('chatspace')
         ul.innerHTML="";
      const token=localStorage.getItem('token')
-     let userlist=await axios.get(`http://localhost:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
+     let userlist=await axios.get(`http://13.235.132.81:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
      localStorage.setItem('userlist',userlist.data)
      userlist.data.forEach(element => {
          ul.innerHTML+=`<li style="list-style: none;">${element.Name} joined</li>`
@@ -375,7 +375,7 @@ async function loadpreviouschat(){
         const token=localStorage.getItem('token')
         try{
       let ul=document.getElementById('personal')
-        let userlist=await axios.get("http://localhost:3000/user/userlist",{headers:{'Authorization':token}})
+        let userlist=await axios.get("http://13.235.132.81:3000/user/userlist",{headers:{'Authorization':token}})
 //localStorage.setItem('userlist',userlist.data)
 userlist.data.forEach(element => {
     if(element.Name==='You'){
@@ -398,7 +398,7 @@ userlist.data.forEach(element => {
             userlistwithid,
             Name:Name
         }
-        let response=await axios.post("http://localhost:3000/group/create",groupinfo,{headers:{'Authorization':token}})
+        let response=await axios.post("http://13.235.132.81:3000/group/create",groupinfo,{headers:{'Authorization':token}})
         if(response.status===201){
             reload1()
         }
