@@ -8,7 +8,7 @@ async function login(e){
         }
     
         try{
-      response=await axios.post("https://13.235.132.81:3000/user/login",User)
+      response=await axios.post("http://13.235.132.81:3000/user/login",User)
       if(response.status==201){
         alert('login successful')
         console.log(response.data.token)
