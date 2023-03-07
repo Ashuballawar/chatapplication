@@ -9,7 +9,7 @@ async function sendmessage(e){
    
    try{
     console.log(chat)
-    let response=await axios.post("http://13.235.132.81:3000/user/sendchat",message,{headers:{'Authorization':token}})
+    let response=await axios.post("https://13.235.132.81:3000/user/sendchat",message,{headers:{'Authorization':token}})
      if(response.status===201){
         console.log('fine')
         document.getElementById('chat').value=""
@@ -30,7 +30,7 @@ async function reload(){
    ul=document.getElementById('chatspace')
    ul.innerHTML="";
 const token=localStorage.getItem('token')
-let userlist=await axios.get("http://13.235.132.81:3000/user/userlist",{headers:{'Authorization':token}})
+let userlist=await axios.get("https://13.235.132.81:3000/user/userlist",{headers:{'Authorization':token}})
 localStorage.setItem('userlist',userlist.data)
 userlist.data.forEach(element => {
     ul.innerHTML+=`<li style="list-style: none;">${element} joined</li>`
@@ -68,7 +68,7 @@ data.forEach(element => {
    else{
     lastid=0;
    }
-   let response=await axios.get(`http://13.235.132.81:3000/user/getchat?datalength=${lastid}`,{headers:{'Authorization':token}})
+   let response=await axios.get(`https://13.235.132.81:3000/user/getchat?datalength=${lastid}`,{headers:{'Authorization':token}})
    if(data){
    response.data=data.concat(response.data)
    if(response.data.length>10){
@@ -87,7 +87,7 @@ event.preventDefault();
 const token=localStorage.getItem('token')
 let data=JSON.parse(localStorage.getItem('chatwithid'))
 firstdata=data[0].id
-let response=await axios.get(`http://13.235.132.81:3000/user/previouschat?firstdata=${firstdata}`,{headers:{'Authorization':token}})
+let response=await axios.get(`https://13.235.132.81:3000/user/previouschat?firstdata=${firstdata}`,{headers:{'Authorization':token}})
    console.log(response);
    response.data =response.data.concat(data)
    getdata(response.data)
@@ -98,7 +98,7 @@ async function getdata(data){
     ul=document.getElementById('chatspace')
     ul.innerHTML="";
  const token=localStorage.getItem('token')
- let userlist=await axios.get("http://13.235.132.81:3000/user/userlist",{headers:{'Authorization':token}})
+ let userlist=await axios.get("https://13.235.132.81:3000/user/userlist",{headers:{'Authorization':token}})
  localStorage.setItem('userlist',userlist.data)
  userlist.data.forEach(element => {
      ul.innerHTML+=`<li style="list-style: none;">${element} joined</li>`
