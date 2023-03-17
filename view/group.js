@@ -1,3 +1,14 @@
+const socket = io('http://localhost:5000')
+socket.on("connect", async() => {
+    console.log('socket====>',socket.id);
+    const token=localStorage.getItem('token')
+       let data={
+        socketId:socket.id
+       }
+    let response=await axios.post("http://localhost:3000/user/updatesocketId",data,{headers:{'Authorization':token}})
+  });
+// sendsocketid(socket.id)
+// 
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -24,7 +35,7 @@ async function makegroup(){
    list.innerHTML='add in group'
    ul.appendChild(list)
    const token=localStorage.getItem('token')
-   let userlist=await axios.get("http://13.235.132.81:3000/user/userlist",{headers:{'Authorization':token}})
+   let userlist=await axios.get("http://localhost:3000/user/userlist",{headers:{'Authorization':token}})
   console.log( userlist)
   decodedtoken=parseJwt(token)
   console.log(decodedtoken)
@@ -74,8 +85,8 @@ let Name=document.getElementById('groupName').value
     userlistwithid,
     Name:Name
   }
-  
-  let response=await axios.post("http://13.235.132.81:3000/group/create",groupinfo,{headers:{'Authorization':token}})
+  socket.emit('join-room',Name)
+  let response=await axios.post("http://localhost:3000/group/create",groupinfo,{headers:{'Authorization':token}})
     if(response.status===201){
         alert('new group created')
   console.log("===>",response.data)
@@ -98,7 +109,7 @@ async function reload1(){
     try{
     document.getElementById('list of groups').innerHTML=" ";
     const token=localStorage.getItem('token')
-    let response=await axios.get("http://13.235.132.81:3000/group/getgroup",{headers:{'Authorization':token}})
+    let response=await axios.get("http://localhost:3000/group/getgroup",{headers:{'Authorization':token}})
     console.log(response.data)
     response.data.forEach(element => {
         document.getElementById('list of groups').innerHTML+=`<li style="list-style:none; cursor: pointer; back;background-color: cornflowerblue;width: 40%;border: outset;" onclick="getgroupinfo(${element.id},'${element.groupName}')"  id=${element.id}>${element.groupName}</li>`
@@ -127,7 +138,7 @@ ul=document.getElementById('chatspace')
 
 
     
-let userlist=await axios.get(`http://13.235.132.81:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
+let userlist=await axios.get(`http://localhost:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
       if(userlist.status===200){
         ul.innerHTML="";
 localStorage.setItem('userlist',userlist.data)
@@ -154,6 +165,9 @@ if(data){
         ul.addEventListener('click',loadpreviouschat)
 
     }
+    while(data.length>10){
+        data.shift()
+    }
    
 data.forEach(element => {
     if(j%2===0){
@@ -168,10 +182,10 @@ data.forEach(element => {
     lastid=0;
    }
 
-   let response=await axios.get(`http://13.235.132.81:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
+   let response=await axios.get(`http://localhost:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
    console.log(response)
    
-   if(data.length>0){
+   if(data){
     response.data=data.concat(response.data)}
   
    while(response.data>10){
@@ -200,22 +214,75 @@ async function showchatbox(id){
     left: 755px;
     top: 41px;
 " ></ul>
-    <form onsubmit="sendmessage(${id})" id="chatform" style="
-    position: fixed;
-    left: 800px;
-    bottom: 0;
-    width: 40%;
-    background-color: purple;
-    color: white;
-    text-align: center;
-    padding: 0px 10px 20px 10px;
-    
-    ">
+<div  style="
+position: fixed;
+left: 800px;
+bottom: 0;
+width: 40%;
+background-color: purple;
+color: white;
+text-align: center;
+padding: 0px 10px 20px 10px;
+
+">
+    <form onsubmit="sendmessage(${id})" id="chatform">
     
         <label for="chat"></label><br>
-        <input type="text" id="chat"  placeholder="message" required="" style="width:70%">
+        <input type="text" id="chat"  placeholder="message" required="" style="width:70%">      
     <button type="submit"  id="formbutton">send</button>
-    </form>`
+    
+  </form>
+  <form id="uploadform" onsubmit="uploadfile(${id})">
+     <label for="myfile"> <i id="plus"class="fa fa-plus" style="font-size:15px; border:1px solid black; padding:10px;"> </i></label>
+  <input type="file" id="myfile"  style="display:none;visibility:none" onchange="getImage(this.value)">
+  <ul id="filename"></ul>
+ 
+  <button id="uploadbtn" style="display:none;">upload</button>
+  </form>
+  </div>`
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
+
+async function getImage(imageName){
+    console.log(imageName)
+    var newName=imageName.replace(/^.*\\/,"")
+    // $('#myfile').html(imageName)
+//    await axios.post()
+    console.log(document.getElementById('myfile').files[0])
+    document.getElementById('filename').innerHTML=`<br><span>${document.getElementById('myfile').files[0].name}</span>`
+     document.getElementById('plus').style.display='none'
+      document.getElementById('formbutton').style.display='none'
+      document.getElementById('uploadbtn').style.display='block'
+}
+async function uploadfile(id){
+    event.preventDefault()
+    let token=localStorage.getItem('token')
+    try{
+    console.log(document.getElementById('myfile').files[0])
+    let file=document.getElementById('myfile').files[0]
+    let formData = new FormData();
+    if (file.name && file) {
+       
+        formData.append("file", file);
+        formData.append("name",file.name);
+       
+      }
+    
+   
+    let response=await axios.post(`http://localhost:3000/group/upload/${id}`,formData,{headers:{'Authorization':token}})
+       if(response.status===201){
+        document.getElementById('chat').value=response.data
+        sendmessage(id)
+        getgroupinfo(id,localStorage.getItem('groupName'))
+       
+        // document.getElementById('formbutton').style.display='block'
+        // document.getElementById('uploadbtn').style.display='none'
+        
+       }
     }
     catch(err){
         console.log(err)
@@ -230,8 +297,15 @@ async function sendmessage(id){
    
    try{
     console.log(chat)
-    let response=await axios.post(`http://13.235.132.81:3000/group/sendchat/${id}`,message,{headers:{'Authorization':token}})
+   
+    let response=await axios.post(`http://localhost:3000/group/sendchat/${id}`,message,{headers:{'Authorization':token}})
      if(response.status===201){
+        // const socket = io('http://localhost:5000')
+
+        socket.emit('send-chat-message',  response.data)
+        //  socket.on('chat-message',(data)=>{
+        //     console.log('socket data=====>',data)
+        //  })
         console.log('fine')
         
         // document.getElementById('groupName').innerHTML+=``
@@ -249,12 +323,11 @@ async function sendmessage(id){
 
    catch(err){
     console.log(err)
+   
    }
 } 
 
-setInterval(() => {
-    getmsessage(localStorage.getItem('groupid')) 
-}, 2000);
+
 
 async function getmsessage(id){
     try{
@@ -263,7 +336,7 @@ async function getmsessage(id){
     let lastid;
     let j=0;
     if(data){
-        console.log(data.length)
+        console.log("data   length=======",data.length)
         
         lastid=data[data.length-1].id
     }
@@ -271,7 +344,7 @@ async function getmsessage(id){
         lastid=0;
     }
     
-    let response=await axios.get(`http://13.235.132.81:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
+    let response=await axios.get(`http://localhost:3000/group/getchat/${id}?datalength=${lastid}`,{headers:{'Authorization':token}})
     if(response.status===201){
         console.log('fine')
         
@@ -287,9 +360,9 @@ async function getmsessage(id){
         }
        if(data){
             response.data=data.concat(response.data)}
-
+            console.log("response.data.length=======>",response.data.length)
            while(response.data.length>10){
-            
+            console.log('dgdgdgdggdgdg')
                  response.data.shift()
             
         }
@@ -307,7 +380,14 @@ async function getmsessage(id){
 
 }
 
-
+socket.on('chat-message', data => {
+    console.log(data)
+    // ul.innerHTML+=`<li style="list-style: none;background-color:#8080807d;height:30px;padding:6px">${data.name}:${data.message} </li>`
+   
+    getmsessage(localStorage.getItem('groupid'))
+   
+}
+)
 
 
 async function loadpreviouschat(){
@@ -319,7 +399,7 @@ async function loadpreviouschat(){
     let data=JSON.parse(localStorage.getItem(`group_${id}`))
     
     firstdata=data[0].id
-    let response=await axios.get(`http://13.235.132.81:3000/group/previouschat/${id}?firstdata=${firstdata}`,{headers:{'Authorization':token}})
+    let response=await axios.get(`http://localhost:3000/group/previouschat/${id}?firstdata=${firstdata}`,{headers:{'Authorization':token}})
        console.log(response);
       
        response.data =response.data.concat(data)
@@ -336,7 +416,7 @@ async function loadpreviouschat(){
         ul=document.getElementById('chatspace')
         ul.innerHTML="";
      const token=localStorage.getItem('token')
-     let userlist=await axios.get(`http://13.235.132.81:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
+     let userlist=await axios.get(`http://localhost:3000/group/userlist/${id}`,{headers:{'Authorization':token}})
      localStorage.setItem('userlist',userlist.data)
      userlist.data.forEach(element => {
          ul.innerHTML+=`<li style="list-style: none;">${element.Name} joined</li>`
@@ -381,7 +461,7 @@ async function loadpreviouschat(){
         const token=localStorage.getItem('token')
         try{
       let ul=document.getElementById('personal')
-        let userlist=await axios.get("http://13.235.132.81:3000/user/userlist",{headers:{'Authorization':token}})
+        let userlist=await axios.get("http://localhost:3000/user/userlist",{headers:{'Authorization':token}})
 //localStorage.setItem('userlist',userlist.data)
 userlist.data.forEach(element => {
     if(element.Name==='You'){
@@ -404,7 +484,7 @@ userlist.data.forEach(element => {
             userlistwithid,
             Name:Name
         }
-        let response=await axios.post("http://13.235.132.81:3000/group/create",groupinfo,{headers:{'Authorization':token}})
+        let response=await axios.post("http://localhost:3000/group/create",groupinfo,{headers:{'Authorization':token}})
         if(response.status===201){
             reload1()
         }

@@ -1,9 +1,11 @@
+
 const signupform=document.getElementById('signupform');
 
 
 signupform.addEventListener('submit',signup);
 async function signup(e){
       e.preventDefault();
+      const socket = io('http://localhost:5000')
       let userinfo={
         Name:e.target.Name.value,
         Email:e.target.Email.value,
@@ -11,7 +13,7 @@ async function signup(e){
         Password:e.target.Password.value
       }
       try{
-     let response=await axios.post("http://13.235.132.81:3000/user/signup",userinfo)
+     let response=await axios.post("http://localhost:3000/user/signup",userinfo)
        if(response.status===201){
         alert('succesfully created accout')
         window.location.href="./login.html"

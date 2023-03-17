@@ -24,6 +24,10 @@ const user=sequelize.define('user',{
     Password:{
         type:Sequelize.STRING,
         allowNull:false,
+    },
+    socketId:{
+        type:Sequelize.STRING,
+        allowNull:false,
     }
 })
 

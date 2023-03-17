@@ -1,7 +1,16 @@
 const user=require('../models/user');
 const bcrypt=require('bcryptjs')
 const jwt=require('jsonwebtoken')
+
+
 require('dotenv').config()
+let express=require('express');
+
+
+const app=express();
+const server=require('http').createServer(app)
+const io=require('socket.io')(server)
+
 
 function isinvalid(a){
     if(a==undefined||a.length===0){
@@ -10,7 +19,9 @@ function isinvalid(a){
     return false;
  }
 
- exports.signup=async(req,res,next)=>{
+
+
+ exports.signup=(req,res,next)=>{
     const Name=req.body.Name
         const Email=req.body.Email
         const Phonenumber=req.body.Phonenumber
@@ -23,13 +34,22 @@ function isinvalid(a){
 
         try{
             bcrypt.hash(Password,10,async(err,hash)=>{
-                console.log(err)    
+                if(err){console.log('errrr=>',err)   } 
            try{
-               data=await user.create({Name:Name,Email:Email,Phonenumber:Phonenumber,Password:hash})
+           
+           
+           var io = req.app.get('socketio');
+           
+            io.sockets.on('connection',async (socket)=>{
+            console.log('========>',socket.id)
+             socket.on('hi',data=>{
+                console.log(data)
+             })
+               data=await user.create({Name:Name,Email:Email,Phonenumber:Phonenumber,Password:hash,socketId:socket.id})
                res.status(201).json(data)
-            }
+            }) }
             catch(err){
-                console.log(err.name)
+                console.log(err)
                 if(err.name=="SequelizeUniqueConstraintError"){
                     res.status(403).json({error:'account already exist of this EmailId or phonenumber'})
                 }
@@ -44,10 +64,13 @@ function isinvalid(a){
         })
     }
         catch(err){
+            console.log(err)
             res.status(500).json({error:err})
         }   
 
  }
+
+
 
  exports.login=async (req,res,next)=>{
     const { Op } = require("sequelize");
@@ -114,4 +137,27 @@ function isinvalid(a){
             console.log(err)
             res.status(500).json({error:err})
           }
+ }
+
+
+
+ exports.updatesocketId=async(req,res,next)=>{
+  
+  try{
+   
+        
+         let response=await user.update({socketId:req.body.socketId},{where:{id:req.user.id}})
+         console.log("response=====>",response)
+         if(response[0]===1){
+           return res.status(201).json(response)}
+           else{
+            return res.status(500).json({msg:'something went wrong'})
+           }
+        }
+  
+    
+    catch(err){
+        console.log(err)
+        res.status(500).json({msg:'something went wrong'})
+    }
  }

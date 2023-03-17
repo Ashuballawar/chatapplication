@@ -9,5 +9,5 @@ router.get('/userlist',getDataMiddleware,usercontroller.userlist)
 router.post('/sendchat',getDataMiddleware,chatcontroller.sendchat)
 router.get('/getchat',getDataMiddleware,chatcontroller.getchat)
 router.get('/previouschat',getDataMiddleware,chatcontroller.previouschat)
-
+router.post('/updatesocketId',getDataMiddleware,usercontroller.updatesocketId)
 module.exports=router;

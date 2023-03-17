@@ -2,8 +2,14 @@ const user=require('../models/user');
 const message=require('../models/message')
 const group=require('../models/group')
 const usergroup=require('../models/usergroup')
+
+
 const bcrypt=require('bcryptjs')
 const jwt=require('jsonwebtoken');
+const AWS=require('aws-sdk')
+
+
+const uploadtos3=require('../services/s3services')
 
 
 
@@ -19,7 +25,7 @@ exports.create=async (req,res,next)=>{
             return res.status(200).json(groupexist[0])
           }
     let newGroup=await group.create({groupName:req.body.Name,createdBy:req.user.id})
-      
+   
     await newGroup.addUser(req.user.id,{through:{Admin:true}});
     console.log(req.body)
    
@@ -45,6 +51,11 @@ exports.getgroup=async (req,res,next)=>{
     res.status(500).json({error:err})
    }
 }
+
+
+
+
+
 exports.getgroupinfo=async (req,res,next)=>{
 
   try{
@@ -58,15 +69,45 @@ catch(err){
   res.status(500).json({error:err})
 }}
 
+
+
+
 exports.sendchat=async (req,res,next)=>{
     try{
-      
+     
         let response=await req.user.createMessage({chat:req.body.chat,Name:req.user.Name,groupId:req.params.id})
-        res.status(201).json(response)}
+        let groupinfo=await group.findAll({where:{id:req.params.id}})
+        // console.log('response=====>',response)
+          let userlist=await groupinfo[0].getUsers()
+          var io = req.app.get('socketio');
+          io.sockets.on('connection',async(socket)=>{
+             console.log('socketid======>',socket.id)
+             socket.on('send-chat-message',data=>{
+           
+              userlist.forEach(element => {
+                
+             console.log(`send to ${element.dataValues.Name}`,data.chat,data.Name )
+                socket.to(element.dataValues.socketId).emit('chat-message', { message:data.chat, name:data.Name,id:response.dataValues.id })
+    
+              })
+             
+             })
+        
+          
+             
+        })
+        console.log('send jdjsjsjsjjjsjsjsjjjsjdjdjj')
+        res.status(201).json(response)
+      
+     
+      }
         catch(err){
             console.log(err)
         }
     }
+  
+
+
 
     exports.userlist=async (req,res,next)=>{
   try{let userid=[]
@@ -89,6 +130,8 @@ res.status(500).json({error:err})
 
 
     }
+
+
 
 
 
@@ -125,6 +168,9 @@ res.status(500).json({error:err})
   
   }
 
+
+
+
     exports.previouschat=async(req,res,next)=>{
         const { Op } = require("sequelize");
         try{
@@ -153,7 +199,9 @@ res.status(500).json({error:err})
     }
 
 
-    exports.userlist=async (req,res,next)=>{
+
+
+    exports.userlist1=async (req,res,next)=>{
 
       try{
         let groupinfo=await group.findAll({where:{id:req.params.id}})
@@ -204,6 +252,9 @@ res.status(500).json({error:err})
         }
   }
 
+
+
+
   exports.delete=async (req,res,next)=>{
 
     try{
@@ -218,6 +269,8 @@ let userId=req.query.id
           }
 
   }
+
+
 
 
   exports.adduser=async(req,res,next)=>{
@@ -248,6 +301,7 @@ let userId=req.query.id
 
 
 
+
   exports.addtogroup=async (req,res,next)=>{
     try{
     let groupinfo=await group.findAll({where:{id:req.params.id}})
@@ -259,3 +313,23 @@ let userId=req.query.id
     res.status(500).json({error:err})
   }
 }
+
+
+
+
+exports.upload=async (req,res)=>{
+   try{
+    
+     let filename=`${req.params.id}_${new Date().getTime()}_${req.files.file.name}`
+  
+
+    let fileURL=await uploadtos3.uploadToS3(req.files.file.data,filename);
+       console.log(fileURL)
+     res.status(201).json(fileURL)
+ 
+  }
+  catch(err){
+     console.log(err)
+     res.status(500).json({err:err,success:false})
+  }
+  }
