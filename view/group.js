@@ -250,8 +250,7 @@ padding: 0px 10px 20px 10px;
 async function getImage(imageName){
     console.log(imageName)
     var newName=imageName.replace(/^.*\\/,"")
-    // $('#myfile').html(imageName)
-//    await axios.post()
+   
     console.log(document.getElementById('myfile').files[0])
     document.getElementById('filename').innerHTML=`<br><span>${document.getElementById('myfile').files[0].name}</span>`
      document.getElementById('plus').style.display='none'
@@ -279,8 +278,6 @@ async function uploadfile(id){
         sendmessage(id)
         getgroupinfo(id,localStorage.getItem('groupName'))
        
-        // document.getElementById('formbutton').style.display='block'
-        // document.getElementById('uploadbtn').style.display='none'
         
        }
     }
@@ -300,12 +297,9 @@ async function sendmessage(id){
    
     let response=await axios.post(`http://localhost:3000/group/sendchat/${id}`,message,{headers:{'Authorization':token}})
      if(response.status===201){
-        // const socket = io('http://localhost:5000')
-
+       
         socket.emit('send-chat-message',  response.data)
-        //  socket.on('chat-message',(data)=>{
-        //     console.log('socket data=====>',data)
-        //  })
+       
         console.log('fine')
         
         // document.getElementById('groupName').innerHTML+=``
