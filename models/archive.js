@@ -1,6 +1,7 @@
 const Sequelize=require('sequelize');
 const sequelize=require('../data/database')
-const message=sequelize.define('message',{
+const archive=sequelize.define('archive',{
+
     id:{
         type:Sequelize.INTEGER,
         autoIncrement:true,
@@ -15,7 +16,25 @@ const message=sequelize.define('message',{
         allowNull:false
     },
    
+   userId:{
+    type:Sequelize.INTEGER,
+   },
+   groupId:{
+    type:Sequelize.INTEGER,
+   },
+   createdAt:{
+    type:Sequelize.DATE
+},
+updatedAt:{
+    type:Sequelize.DATE
+},
+
+    
+
+
+
+
 
 })
 
-module.exports=message
+module.exports=archive

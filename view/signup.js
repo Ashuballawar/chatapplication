@@ -23,11 +23,6 @@ async function signup(e){
     }
      catch(err){
         console.log(err)
-        // if(err.response.status===403){
-        //     alert(err.response.data.error)}
-        // //document.body.innerHTML+=`<div style="color:red;">${err.response.data.error}</div>`}
-        // else{
-        //     document.body.innerHTML+=`<div style="color:red;">${err}</div>`
-        // }
+       
      }
 }

@@ -7,7 +7,7 @@ const fileUpload=require('express-fileupload')
 const bodyParser=require('body-parser')
 const morgan=require('morgan');
 const helmet=require('helmet');
-
+const cron = require("node-cron");
 
 
 
@@ -17,13 +17,13 @@ const grouprouter=require('./routes/grouproute')
 
 
 
-
+const Sequelize=require('sequelize')
 const sequelize=require('./data/database')
 const User=require('./models/user')
 const Message=require('./models/message')
 const Group=require('./models/group')
 const Usergroup=require('./models/usergroup')
-const Personalchat=require('./models/personalchat')
+const archive=require('./models/archive')
 
 
 var cors = require('cors')
@@ -83,8 +83,6 @@ User.belongsToMany(Group,{through:Usergroup})
 
 
 
-User.hasMany(Personalchat)
-Personalchat.belongsTo(User)
 
 
 
@@ -96,9 +94,19 @@ app.use((req,res)=>{
     res.sendFile(path.join(__dirname,`view/${req.url}`))
 })
 
-
-
-
+cron.schedule("21 3 * * *", async function() {
+   
+  try{
+    let response=await sequelize.query("insert into archives select * from messages", { 
+             
+                           })
+   
+   let message=await Message.destroy({where:{}})
+        
+  }
+  catch(err){
+    console.log(err)
+  }})
 
 sequelize.sync().then(result=>{
   
